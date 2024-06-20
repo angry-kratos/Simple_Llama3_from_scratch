@@ -22,7 +22,7 @@ Llama 3 is a large-scale transformer-based language model designed to generate h
 
 Converting text into a sequence of tokens that the model can process.
 
-![alt text](token.png)
+![alt text](images/token.png)
 
 What is Tokenization?
 
@@ -62,7 +62,7 @@ Repeat the process until the desired vocabulary size is reached.
 
 Embedding is a fundamental concept in Large Language Models (LLMs) like Llama 3. It involves transforming discrete tokens (words, subwords, or characters) into continuous vector representations that capture their meanings and relationships in a high-dimensional space. 
 
-![alt text](embedding.svg)
+![alt text](images/embedding.svg)
 
 What is an Embedding?
 
@@ -92,7 +92,7 @@ Self-attention and multi-head self-attention are key mechanisms in transformer m
 
 Self-attention, also known as scaled dot-product attention, is a mechanism that allows each word in a sequence to focus on other words in the sequence. This helps the model capture dependencies between words, regardless of their distance from each other.
 
-![alt text](attention.png)
+![alt text](images/attention.png)
 
 ### Key Components: Q, K, and V
 
@@ -154,7 +154,7 @@ output, attention_weights = self_attention(query, key, value)
 ```
 ## Multi-Head Self-Attention
 
-![alt text](multihead.png)
+![alt text](images/multihead.png)
 
 Multi-head self-attention is an extension of self-attention that allows the model to focus on different parts of the sequence simultaneously. It achieves this by using multiple sets of Query, Key, and Value weight matrices, known as heads.
 
@@ -230,7 +230,7 @@ output, attention_weights = mhsa(x)
 
 Now Let's move to the Llama 3 part
 
-![alt text](llama3.png)
+![alt text](images/llama3.png)
 
 Components of the Architecture
 
@@ -320,3 +320,5 @@ This code snippet initializes the Llama 3 model with a given prompt and prints t
 ## Conclusion
 
 This implementation provides a detailed and modular approach to building a transformer-based language model from scratch. By understanding each component and its role in the overall architecture, you can extend and customize this implementation to suit your specific needs.
+
+![alt text](images/llama_pic.webp)
