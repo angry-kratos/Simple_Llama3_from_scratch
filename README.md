@@ -1,4 +1,3 @@
-
 # Llama 3 Implementation from Scratch
 
 ## Overview
@@ -14,7 +13,6 @@ You'll be directeed to the Llama repo after verification and from there you can 
 I am using the same prompt example as the A10 lab did, because The Hitchhiker's Guide to the Galaxy is goated.
 
 Firstly, we will cover the Theory required(u can skip and jump to the code explanation part) then we will see how the code is working.
-
 
 ## Theory
 
@@ -60,17 +58,13 @@ Merge the most frequent pair ("l", "o") to form "lo":
 New tokens: {"lo", "w", "e", "r"}
 Repeat the process until the desired vocabulary size is reached.
 
-
 2. **Embedding**: Transforming tokens into dense vector representations.
 
 Embedding is a fundamental concept in Large Language Models (LLMs) like Llama 3. It involves transforming discrete tokens (words, subwords, or characters) into continuous vector representations that capture their meanings and relationships in a high-dimensional space. 
 
-
 ![alt text](embedding.svg)
 
-
 What is an Embedding?
-
 
 An embedding is a dense vector representation of a token. Unlike one-hot encoding, where each token is represented by a binary vector with a single high value, embeddings are continuous vectors of fixed dimensions. These vectors capture semantic information about the tokens, allowing the model to understand and process language more effectively.
 
@@ -88,9 +82,7 @@ How are Embeddings Learned?
 
 Embeddings are typically learned during the training of the language model. The training process adjusts the embeddings so that they capture the relationships and meanings of tokens in the context of the tasks the model is trained on.
 
-
 3. **Attention Mechanism**: Allowing the model to focus on different parts of the input sequence.
-
 
 # Self-Attention and Multi-Head Self-Attention in Detail
 
@@ -100,9 +92,7 @@ Self-attention and multi-head self-attention are key mechanisms in transformer m
 
 Self-attention, also known as scaled dot-product attention, is a mechanism that allows each word in a sequence to focus on other words in the sequence. This helps the model capture dependencies between words, regardless of their distance from each other.
 
-
 ![alt text](attention.png)
-
 
 ### Key Components: Q, K, and V
 
@@ -162,9 +152,7 @@ value = torch.randn(10, 5, 64)
 
 output, attention_weights = self_attention(query, key, value)
 ```
-
 ## Multi-Head Self-Attention
-
 
 ![alt text](multihead.png)
 
@@ -188,25 +176,6 @@ Multi-head self-attention is an extension of self-attention that allows the mode
    
 4. **Final Linear Transformation**:
    - We apply a final linear transformation to the concatenated outputs to produce the final result.
-
-### Mathematical Formulation
-
-Given:
-- Number of heads: \( h \)
-- Input sequence: \( X \in \mathbb{R}^{n 	imes d} \)
-- Learned weight matrices for each head: \( W_Q^i, W_K^i, W_V^i \in \mathbb{R}^{d 	imes d_k} \), and \( W_O \in \mathbb{R}^{h \cdot d_v 	imes d} \)
-
-The steps are:
-1. For each head \( i \):
-   - \( Q_i = XW_Q^i \)
-   - \( K_i = XW_K^i \)
-   - \( V_i = XW_V^i \)
-   - \( 	ext{Scores}_i = rac{Q_iK_i^T}{\sqrt{d_k}} \)
-   - \( 	ext{Attention Weights}_i = 	ext{softmax}(	ext{Scores}_i) \)
-   - \( 	ext{Output}_i = 	ext{Attention Weights}_i \cdot V_i \)
-   
-2. Concatenate the outputs from all heads: \( 	ext{Concat}(	ext{Output}_1, 	ext{Output}_2, ..., 	ext{Output}_h) \)
-3. Apply the final linear transformation: \( 	ext{Output} = 	ext{Concat} \cdot W_O \)
 
 ### Code Example (Simplified)
 
@@ -257,7 +226,6 @@ output, attention_weights = mhsa(x)
 - **Self-Attention for Each Head**: Self-attention is applied independently for each head.
 - **Concatenate and Final Linear Transformation**: The outputs from all heads are concatenated and passed through a final linear layer to produce the final output.
 
-
 ## Architecture
 
 Now Let's move to the Llama 3 part
@@ -266,75 +234,70 @@ Now Let's move to the Llama 3 part
 
 Components of the Architecture
 
+- **Input Embeddings**:
+  - The input text is first tokenized into a sequence of tokens.
+  - Each token is converted into a dense vector representation (embedding) using an embedding layer.
+  - This embedding layer transforms the discrete tokens into continuous vector space, allowing the model to process them efficiently.
 
-Input Embeddings:
+- **Rotary Positional Encodings**:
+  - Positional encodings are added to the input embeddings to provide information about the position of each token in the sequence.
+  - LLaMA uses Rotary Positional Encodings (RoPE), which introduce rotational invariance to the position information, improving the model's ability to generalize across different positions in the sequence.
 
-The input text is first tokenized into a sequence of tokens.
-Each token is converted into a dense vector representation (embedding) using an embedding layer.
-This embedding layer transforms the discrete tokens into continuous vector space, allowing the model to process them efficiently.
-Rotary Positional Encodings:
+- **RMS Normalization (RMS Norm)**:
+  - Root Mean Square (RMS) normalization is applied to stabilize the training and inference process.
+  - RMS normalization helps in maintaining numerical stability by normalizing the activations based on their root mean square values.
 
-Positional encodings are added to the input embeddings to provide information about the position of each token in the sequence.
-LLaMA uses Rotary Positional Encodings (RoPE), which introduce rotational invariance to the position information, improving the model's ability to generalize across different positions in the sequence.
-RMS Normalization (RMS Norm):
+- **Self-Attention Layer**:
+  - The self-attention mechanism allows the model to weigh the importance of each token in the sequence relative to every other token.
+  - In LLaMA, self-attention is implemented using Grouped Multi-Query Attention with a KV (Key-Value) cache. This means that multiple query vectors share the same key and value vectors, optimizing memory usage and computation.
+  - The self-attention layer produces three sets of vectors: Query (Q), Key (K), and Value (V).
 
-Root Mean Square (RMS) normalization is applied to stabilize the training and inference process.
-RMS normalization helps in maintaining numerical stability by normalizing the activations based on their root mean square values.
-Self-Attention Layer:
+- **Feed-Forward Network (SwigLU)**:
+  - Following the self-attention layer, the output is passed through a feed-forward network.
+  - The feed-forward network consists of two linear layers with a SwigLU activation function in between. SwigLU (Swish-Gated Linear Unit) is a variant of the popular GELU (Gaussian Error Linear Unit) activation function.
+  - This component helps in transforming the representations further, adding non-linearity and complexity to the model.
 
-The self-attention mechanism allows the model to weigh the importance of each token in the sequence relative to every other token.
-In LLaMA, self-attention is implemented using Grouped Multi-Query Attention with a KV (Key-Value) cache. This means that multiple query vectors share the same key and value vectors, optimizing memory usage and computation.
-The self-attention layer produces three sets of vectors: Query (Q), Key (K), and Value (V).
-Feed-Forward Network (SwigLU):
+- **Residual Connections and RMS Normalization**:
+  - Residual connections (skip connections) are added around the self-attention and feed-forward layers. These connections help in preserving the original input information and improving gradient flow during backpropagation.
+  - RMS normalization is applied again after the feed-forward network to maintain stability.
 
-Following the self-attention layer, the output is passed through a feed-forward network.
-The feed-forward network consists of two linear layers with a SwigLU activation function in between. SwigLU (Swish-Gated Linear Unit) is a variant of the popular GELU (Gaussian Error Linear Unit) activation function.
-This component helps in transforming the representations further, adding non-linearity and complexity to the model.
-Residual Connections and RMS Normalization:
+- **Output Linear and Softmax Layers**:
+  - The final output from the feed-forward network goes through a linear transformation.
+  - A softmax function is applied to the output to convert it into probabilities. This is typically used during the generation of text, where the model predicts the next token in the sequence.
 
-Residual connections (skip connections) are added around the self-attention and feed-forward layers. These connections help in preserving the original input information and improving gradient flow during backpropagation.
-RMS normalization is applied again after the feed-forward network to maintain stability.
-Output Linear and Softmax Layers:
+### Detailed Process Flow
 
-The final output from the feed-forward network goes through a linear transformation.
-A softmax function is applied to the output to convert it into probabilities. This is typically used during the generation of text, where the model predicts the next token in the sequence.
-Detailed Process Flow
-Embedding Layer:
+1. **Embedding Layer**:
+   - **Input**: Tokenized text
+   - **Output**: Dense vector representations (embeddings)
 
-Input: Tokenized text
-Output: Dense vector representations (embeddings)
-Adding Positional Encodings:
+2. **Adding Positional Encodings**:
+   - **Input**: Embeddings
+   - **Output**: Position-enhanced embeddings
 
-Input: Embeddings
-Output: Position-enhanced embeddings
-Self-Attention Layer:
+3. **Self-Attention Layer**:
+   - **Input**: Position-enhanced embeddings
+   - **Output**: Contextualized token representations using self-attention
+   - **Operations**: Query, Key, and Value computations, attention score calculations, softmax, and weighted sum
 
-Input: Position-enhanced embeddings
-Output: Contextualized token representations using self-attention
-Operations: Query, Key, and Value computations, attention score calculations, softmax, and weighted sum
-Feed-Forward Network:
+4. **Feed-Forward Network**:
+   - **Input**: Contextualized token representations
+   - **Output**: Transformed token representations
+   - **Operations**: Linear transformation, SwigLU activation, second linear transformation
 
-Input: Contextualized token representations
-Output: Transformed token representations
-Operations: Linear transformation, SwigLU activation, second linear transformation
-Residual Connections and RMS Normalization:
+5. **Residual Connections and RMS Normalization**:
+   - **Input**: Transformed token representations
+   - **Output**: Normalized and residual-enhanced representations
 
-Input: Transformed token representations
-Output: Normalized and residual-enhanced representations
-Final Linear and Softmax Layers:
+6. **Final Linear and Softmax Layers**:
+   - **Input**: Normalized representations
+   - **Output**: Probability distributions over the vocabulary (for predicting the next token)
 
-Input: Normalized representations
-
-
-Output: Probability distributions over the vocabulary (for predicting the next token)
-Iterative Process (Nx)
+### Iterative Process (Nx)
 
 The architecture includes multiple layers (Nx), where "N" represents the number of such layers stacked together. Each layer contains the self-attention and feed-forward sub-layers.
 
 The output of one layer becomes the input to the next layer, allowing the model to build increasingly complex and abstract representations.
-
-## Explanation of the code:
-
 
 
 ## Usage
